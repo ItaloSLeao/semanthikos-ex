@@ -1,0 +1,78 @@
+<div style="max-width:800px; margin:0 auto; padding:2rem;" class="anim-fadein">
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+    <div>
+      <h1 style="font-family:'DM Serif Display',serif; font-size:1.8rem; margin:0; color:var(--text-primary);">
+        Chat ao Vivo
+      </h1>
+      <p style="font-size:0.9rem; color:var(--text-secondary); margin:0.2rem 0 0;">
+        Evento: <%= @event.title %>
+      </p>
+    </div>
+    <a href={~p"/events/#{@event.id}"} style="font-size:0.85rem; color:var(--text-secondary); text-decoration:none; font-weight:600; background:var(--bg-surface-hover); padding:6px 16px; border-radius:9999px; display:inline-flex; align-items:center; gap:6px; border:1px solid var(--border-color); transition:all 0.2s;">
+      &larr; Voltar ao Evento
+    </a>
+  </div>
+
+  <div class="surface" style="display:flex; flex-direction:column; height:60vh;">
+    
+    <!-- Messages Area -->
+    <div id="chat-messages" phx-hook="ChatScroll" style="flex:1; padding:1.5rem; overflow-y:auto; display:flex; flex-direction:column; gap:1rem;" phx-update="stream">
+      <%= for {dom_id, msg} <- @streams.messages do %>
+        <% is_mine = msg.user_id == @current_user.id %>
+        <div id={dom_id} style={"display:flex; flex-direction:column; max-width:85%; " <> if(is_mine, do: "align-self:flex-end; align-items:flex-end;", else: "align-self:flex-start; align-items:flex-start;")}>
+          
+          <div style={"display:flex; align-items:baseline; gap:8px; margin-bottom:4px; " <> if(is_mine, do: "flex-direction:row-reverse;", else: "")}>
+            <span style="font-weight:600; font-size:0.85rem; color:var(--text-primary);"><%= if is_mine, do: "Você", else: msg.user_name %></span>
+            <span style="font-size:0.7rem; color:var(--text-muted);">
+              <local-time datetime={NaiveDateTime.to_iso8601(msg.sent_at)}><%= Calendar.strftime(msg.sent_at, "%H:%M") %></local-time>
+            </span>
+          </div>
+
+          <div style={"padding:12px 16px; border-radius:12px; font-size:0.95rem; line-height:1.5; " <> 
+                      if(msg.is_question, 
+                        do: "background:var(--primary-glow); border:1px solid var(--primary); color:var(--text-primary);", 
+                        else: if(is_mine, do: "background:var(--primary); color:#000; font-weight:500;", else: "background:var(--bg-surface-hover); border:1px solid var(--border-color); color:var(--text-primary);"))}>
+            
+            <%= if msg.is_question do %>
+              <div style="font-size:0.7rem; text-transform:uppercase; font-weight:700; color:var(--primary); margin-bottom:4px; display:flex; justify-content:space-between; align-items:center;">
+                <span>Pergunta</span>
+                <%= if msg.is_answered do %>
+                  <span style="color:var(--success);">✓ Respondida</span>
+                <% end %>
+              </div>
+            <% end %>
+            
+            <%= msg.message %>
+          </div>
+
+          <%= if msg.is_question and !msg.is_answered and @current_user.role in [:admin, :speaker] do %>
+            <button phx-click="mark_answered" phx-value-message_id={msg.id}
+                    style="margin-top:6px; font-size:0.75rem; color:var(--success); background:none; border:none; cursor:pointer; font-weight:600;">
+              ✓ Marcar como Respondida
+            </button>
+          <% end %>
+
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Input Area -->
+    <div style="padding:1.5rem; border-top:1px solid var(--border-color); background:var(--bg-body); border-radius:0 0 16px 16px;">
+      <form id="chat-form" phx-submit="send_message" style="display:flex; flex-direction:column; gap:10px;">
+        <div style="display:flex; gap:10px;">
+          <input type="text" id="chat-input" name="message" value={@message_input} placeholder="Digite sua mensagem..." autocomplete="off" class="input-field" required />
+          
+          <button type="submit" phx-disable-with="Enviando..." class="btn btn-primary">
+            Enviar
+          </button>
+        </div>
+
+        <label style="display:flex; align-items:center; gap:8px; font-size:0.85rem; color:var(--text-secondary); cursor:pointer;">
+          <input type="checkbox" id="chat-is-question" name="is_question" value="true" checked={@is_question} style="accent-color:var(--primary);" />
+          Marcar como Pergunta (Destaque)
+        </label>
+      </form>
+    </div>
+
+  </div>
+</div>
