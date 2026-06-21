@@ -6,14 +6,12 @@
       <h1 style="font-family:'DM Serif Display',serif; font-size:3rem; color: var(--text-primary); margin:0;">Meus Certificados</h1>
     </div>
     
-    <div class="surface" style="padding: 2rem; flex: 1; max-width: 500px;">
-      <h3 style="font-size: 1.1rem; font-weight: 600; margin: 0 0 0.5rem; color: var(--text-primary);">Autenticidade</h3>
-      <p style="font-size: 0.95rem; color: var(--text-secondary); margin: 0 0 1.25rem;">Verifique a validade de um documento emitido.</p>
-      <.form for={%{}} as={:search} action={~p"/certificates/verify"} method="get" style="display: flex; gap: 0.5rem;">
-        <input type="text" name="certificate_number" placeholder="CERT-123-456" required class="input-field" style="flex: 1;" />
-        <button type="submit" class="btn btn-primary">Validar</button>
-      </.form>
-    </div>
+    <a href={~p"/certificates/verify"} class="btn btn-secondary" style="display:flex; align-items:center; gap:8px;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline>
+      </svg>
+      Verificar autenticidade de Certificado
+    </a>
   </div>
 
   <%!-- Certificates Grid --%>
