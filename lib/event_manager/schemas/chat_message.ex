@@ -11,6 +11,9 @@ defmodule EventManager.Schemas.ChatMessage do
     field :sent_at, :utc_datetime
     field :is_question, :boolean, default: false
     field :is_answered, :boolean, default: false
+    field :file_url, :string
+    field :file_name, :string
+    field :file_type, :string
 
     belongs_to :event, EventManager.Schemas.Event
     belongs_to :user, EventManager.Schemas.User
@@ -21,12 +24,24 @@ defmodule EventManager.Schemas.ChatMessage do
   @doc false
   def changeset(chat_message, attrs) do
     chat_message
-    |> cast(attrs, [:message, :event_id, :user_id, :is_question, :is_answered])
-    |> validate_required([:message, :event_id, :user_id])
-    |> validate_length(:message, min: 1, max: 1000)
+    |> cast(attrs, [:message, :event_id, :user_id, :is_question, :is_answered, :file_url, :file_name, :file_type])
+    |> validate_required([:event_id, :user_id])
+    |> validate_message_or_file()
+    |> validate_length(:message, max: 1000)
     |> default_sent_at()
     |> foreign_key_constraint(:event_id)
     |> foreign_key_constraint(:user_id)
+  end
+
+  defp validate_message_or_file(changeset) do
+    message = get_field(changeset, :message)
+    file_url = get_field(changeset, :file_url)
+
+    if (is_nil(message) or String.trim(message) == "") and is_nil(file_url) do
+      add_error(changeset, :message, "can't be blank if no file is attached")
+    else
+      changeset
+    end
   end
 
   defp default_sent_at(changeset) do

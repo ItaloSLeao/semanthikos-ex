@@ -23,7 +23,10 @@ defmodule EventManagerWeb.EventChatLive do
         avatar_path: if(msg.user, do: msg.user.avatar_path, else: nil),
         sent_at: msg.sent_at,
         is_question: msg.is_question,
-        is_answered: msg.is_answered
+        is_answered: msg.is_answered,
+        file_url: Map.get(msg, :file_url),
+        file_name: Map.get(msg, :file_name),
+        file_type: Map.get(msg, :file_type)
       }
 
       if last_date != msg_date do
@@ -51,6 +54,7 @@ defmodule EventManagerWeb.EventChatLive do
         current_user: current_user,
         last_message_date: last_date
       )
+      |> allow_upload(:chat_file, accept: ~w(.jpg .jpeg .png .pdf), max_entries: 1, max_file_size: 10_000_000)
       |> stream(:messages, messages)
     }
   end
@@ -65,14 +69,36 @@ defmodule EventManagerWeb.EventChatLive do
   def handle_event("send_message", params, socket) do
     msg = params["message"]
     is_q = params["is_question"] == "true"
+
+    uploaded_files = consume_uploaded_entries(socket, :chat_file, fn %{path: path}, entry ->
+      dest_dir = "priv/static/uploads/chat"
+      File.mkdir_p!(dest_dir)
+      ext = Path.extname(entry.client_name)
+      file_name = "#{System.unique_integer([:positive])}-#{entry.uuid}#{ext}"
+      dest = Path.join(dest_dir, file_name)
+      File.cp!(path, dest)
+      {:ok, %{url: "/uploads/chat/#{file_name}", name: entry.client_name, type: entry.client_type}}
+    end)
     
-    if msg && String.trim(msg) != "" do
+    file_data = List.first(uploaded_files)
+
+    if (msg && String.trim(msg) != "") or not is_nil(file_data) do
       attrs = %{
         event_id: socket.assigns.event.id,
         user_id: socket.assigns.current_user.id,
         message: msg,
         is_question: is_q
       }
+      
+      attrs = if file_data do
+        Map.merge(attrs, %{
+          file_url: file_data.url,
+          file_name: file_data.name,
+          file_type: file_data.type
+        })
+      else
+        attrs
+      end
 
       case EventManager.Services.create_chat_message(attrs) do
         {:ok, _new_msg} -> 
@@ -115,7 +141,10 @@ defmodule EventManagerWeb.EventChatLive do
       avatar_path: msg.avatar_path,
       sent_at: msg.sent_at,
       is_question: msg.is_question,
-      is_answered: msg.is_answered
+      is_answered: msg.is_answered,
+      file_url: Map.get(msg, :file_url),
+      file_name: Map.get(msg, :file_name),
+      file_type: Map.get(msg, :file_type)
     }
 
     if last_date != msg_date do
