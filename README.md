@@ -18,20 +18,18 @@ Este sistema permite a gestão completa de eventos acadêmicos, incluindo:
 - **Dashboards e relatórios** com visualizações gráficas
 - **Controle de acesso** baseado em papéis (RBAC)
 
-### Telas do Sistema
+### Telas
 
-<div align="center">
-  <img src="img/01.png" width="48%" alt="Tela 01">
-  <img src="img/02.png" width="48%" alt="Tela 02">
-  <img src="img/03.png" width="48%" alt="Tela 03">
-  <img src="img/04.png" width="48%" alt="Tela 04">
-  <img src="img/05.png" width="48%" alt="Tela 05">
-  <img src="img/06.png" width="48%" alt="Tela 06">
-  <img src="img/07.png" width="48%" alt="Tela 07">
-  <img src="img/08.png" width="48%" alt="Tela 08">
-  <img src="img/09.png" width="48%" alt="Tela 09">
-  <img src="img/10.png" width="48%" alt="Tela 10">
-</div>
+![](img/10.png)
+![](img/01.png)
+![](img/02.png)
+![](img/03.png)
+![](img/04.png)
+![](img/05.png)
+![](img/06.png)
+![](img/07.png)
+![](img/08.png)
+![](img/09.png)
 
 ### Estrutura de Diretórios
 
@@ -74,53 +72,6 @@ priv/
 ├── nginx/                            # Configuração Nginx
 └── static/                           # Arquivos estáticos
 ```
-
-## Funcionalidades
-
-### 1. Autenticação e Autorização (RBAC)
-
-Três níveis de acesso:
-
-| Papel | Permissões |
-|-------|-----------|
-| **Admin** | Criar/editar eventos, gerenciar usuários, ver relatórios, gerar certificados |
-| **Palestrante** | Ver seus eventos, marcar presença, responder perguntas no chat |
-| **Estudante** | Inscrever-se em eventos, baixar certificados, participar do chat |
-
-### 2. Gestão de Eventos
-
-- Criação com campos: título, descrição, data, local, vagas, palestrante
-- Controle de status: rascunho, publicado, em andamento, concluído, cancelado
-- Validação de vagas com **optimistic locking**
-- Busca full-text em português (PostgreSQL tsvector)
-
-### 3. Sistema de Inscrições
-
-- Reserva atômica de vagas (evita overbooking)
-- Cancelamento com liberação de vaga
-- Lista de espera (opcional)
-- Confirmação de presença
-
-### 4. Chat em Tempo Real
-
-- Phoenix Channels para WebSockets
-- Perguntas e respostas durante eventos
-- Marcação de perguntas respondidas
-- Histórico de mensagens persistente
-
-### 5. Certificados
-
-- Geração automática em PDF/HTML
-- Número único de certificado
-- Verificação pública por código
-- Download pelo participante
-
-### 6. Relatórios e Dashboards
-
-- Taxa de ocupação por evento
-- Participação por curso/departamento
-- Estatísticas mensais
-- Exportação CSV
 
 ### Setup Local
 
