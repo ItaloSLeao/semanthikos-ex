@@ -19,7 +19,6 @@ defmodule EventManagerWeb.Router do
   scope "/", EventManagerWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
     get "/events", EventController, :index
     get "/events/:id", EventController, :show
     get "/certificates/verify", CertificateController, :verify
@@ -50,6 +49,7 @@ defmodule EventManagerWeb.Router do
     delete "/events/:id/register", EventController, :cancel_registration
 
     live_session :authenticated_user, on_mount: [{EventManagerWeb.UserAuth, :ensure_authenticated}] do
+      live "/", HomeLive, :index
       live "/events/:id/chat", EventChatLive
       live "/events/:id/dashboard", EventDashboardLive
     end

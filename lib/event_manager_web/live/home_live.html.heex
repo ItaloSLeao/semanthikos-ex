@@ -1,0 +1,170 @@
+<style>
+  .metric-card {
+    transition: all 0.3s ease;
+  }
+  .metric-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--primary);
+    box-shadow: 0 8px 24px var(--primary-glow);
+  }
+  
+  .pill-link {
+    display: inline-block;
+    margin-top: 1.5rem;
+    padding: 6px 16px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--primary);
+    background: transparent;
+    border: 1px solid var(--primary);
+    border-radius: 9999px;
+    text-decoration: none;
+    text-align: center;
+    transition: all 0.2s ease;
+  }
+  .pill-link:hover {
+    background: var(--primary);
+    color: #0d0f1a;
+    box-shadow: 0 4px 12px var(--primary-glow);
+  }
+</style>
+
+<div class="anim-fadein" style="max-width:1200px; margin:0 auto; padding:2rem;">
+  
+  <!-- Hero / Welcome Section -->
+  <div style="margin-bottom:3rem;">
+    <h1 style="font-family:'DM Serif Display',serif; font-size:2.5rem; color:var(--text-primary); margin:0;">
+      Olá, <%= @current_user.name |> String.split(" ") |> List.first() %>! Bem-vindo ao Seman<span style="color:var(--primary);">thikos</span>.
+    </h1>
+    <p style="color:var(--text-secondary); font-size:1.1rem; margin-top:0.5rem;">
+      Sua Jornada Acadêmica e Hub de Eventos.
+    </p>
+  </div>
+
+  <!-- Quick Stats -->
+  <div style="margin-bottom:3rem;">
+    <h2 style="font-size:0.9rem; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-muted); margin-bottom:1rem;">Suas Métricas Acadêmicas</h2>
+    
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:1.5rem;">
+      
+      <!-- Horas Complementares -->
+      <div class="surface metric-card" style="padding:1.5rem; border-radius:16px; border:1px solid var(--border-color); display:flex; flex-direction:column; justify-content:space-between; position:relative; overflow:hidden;">
+        <div>
+          <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+            <h3 style="margin:0; font-size:1.1rem; font-weight:600; color:var(--text-primary);">Horas Complementares</h3>
+            <div style="background:var(--bg-surface-hover); padding:8px; border-radius:8px;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"></path></svg>
+            </div>
+          </div>
+          <div style="margin-top:1.5rem;">
+            <div style="display:flex; align-items:baseline; gap:8px;">
+              <span style="font-size:2.2rem; font-weight:700; color:var(--primary);"><%= @total_hours %></span>
+              <span style="color:var(--text-muted); font-size:0.9rem;">horas acumuladas</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Certificados -->
+      <div class="surface metric-card" style="padding:1.5rem; border-radius:16px; border:1px solid var(--border-color); display:flex; flex-direction:column; justify-content:space-between;">
+        <div>
+          <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+            <h3 style="margin:0; font-size:1.1rem; font-weight:600; color:var(--text-primary);">Certificados Validados</h3>
+            <div style="background:var(--bg-surface-hover); padding:8px; border-radius:8px;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>
+            </div>
+          </div>
+          <div style="margin-top:1.5rem;">
+            <div style="display:flex; align-items:baseline; gap:8px;">
+              <span style="font-size:2.2rem; font-weight:700; color:var(--text-primary);"><%= length(@my_certificates) %></span>
+              <span style="color:var(--text-muted); font-size:0.9rem;">certificados ganhos</span>
+            </div>
+          </div>
+        </div>
+        <a href={~p"/my/certificates"} class="pill-link">Ver todos os certificados &rarr;</a>
+      </div>
+
+      <!-- Eventos Inscritos -->
+      <div class="surface metric-card" style="padding:1.5rem; border-radius:16px; border:1px solid var(--border-color); display:flex; flex-direction:column; justify-content:space-between;">
+        <div>
+          <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+            <h3 style="margin:0; font-size:1.1rem; font-weight:600; color:var(--text-primary);">Eventos Ativos</h3>
+            <div style="background:var(--bg-surface-hover); padding:8px; border-radius:8px;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            </div>
+          </div>
+          <div style="margin-top:1.5rem;">
+            <div style="display:flex; align-items:baseline; gap:8px;">
+              <span style="font-size:2.2rem; font-weight:700; color:var(--text-primary);"><%= length(@my_events) %></span>
+              <span style="color:var(--text-muted); font-size:0.9rem;">inscrições ativas</span>
+            </div>
+          </div>
+        </div>
+        <a href={~p"/events"} class="pill-link">Ver todos os eventos &rarr;</a>
+      </div>
+
+    </div>
+  </div>
+
+  <div style="display:grid; grid-template-columns: 1fr 1fr; gap:3rem;">
+    
+    <!-- Next Event Panel -->
+    <div>
+      <h2 style="font-size:0.9rem; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-muted); margin-bottom:1rem;">Próximo Evento</h2>
+      <%= if @next_event do %>
+        <div class="surface" style="border-radius:16px; overflow:hidden; border:1px solid var(--primary); box-shadow:0 0 24px var(--primary-glow); transition:transform 0.2s;">
+          <div style="background:var(--bg-surface-hover); padding:1.5rem; border-bottom:1px solid var(--border-color);">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+              <h3 style="margin:0; font-size:1.4rem; color:var(--text-primary); line-height:1.3; font-weight:600;"><%= @next_event.title %></h3>
+            </div>
+            <div style="margin-top:1rem; display:flex; flex-direction:column; gap:8px;">
+              <div style="display:flex; align-items:center; gap:8px; color:var(--text-secondary); font-size:0.95rem;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                <%= Calendar.strftime(@next_event.date, "%d/%m/%Y") %> &bull; <%= Calendar.strftime(@next_event.date, "%H:%M") %>
+              </div>
+              <div style="display:flex; align-items:center; gap:8px; color:var(--text-secondary); font-size:0.95rem;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                <%= @next_event.location %>
+              </div>
+            </div>
+          </div>
+          <div style="padding:1.5rem; background:var(--bg-surface); display:flex; gap:12px;">
+            <a href={~p"/events/#{@next_event.id}/chat"} class="btn btn-primary" style="flex:1; text-align:center;">Entrar no Chat</a>
+            <a href={~p"/events/#{@next_event.id}"} class="btn btn-secondary" style="flex:1; text-align:center;">Ver Detalhes</a>
+          </div>
+        </div>
+      <% else %>
+        <div class="surface" style="padding:2rem; border-radius:16px; border:1px dashed var(--border-color); text-align:center;">
+          <p style="color:var(--text-muted); margin:0;">Você não tem eventos futuros agendados.</p>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Explore Panel -->
+    <div>
+      <h2 style="font-size:0.9rem; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-muted); margin-bottom:1rem;">Descubra Novos Eventos</h2>
+      <div style="display:flex; flex-direction:column; gap:1rem;">
+        <%= for event <- @explore_events do %>
+          <a href={~p"/events/#{event.id}"} class="surface" style="display:flex; align-items:center; justify-content:space-between; padding:1.2rem; border-radius:12px; text-decoration:none; border:1px solid var(--border-color); transition:all 0.2s;" onmouseover="this.style.background='var(--bg-surface-hover)'; this.style.borderColor='var(--primary)';" onmouseout="this.style.background='var(--bg-surface)'; this.style.borderColor='var(--border-color)';">
+            <div>
+              <h4 style="margin:0; font-size:1.1rem; color:var(--text-primary); font-weight:600;"><%= event.title %></h4>
+              <p style="margin:4px 0 0; font-size:0.85rem; color:var(--text-muted);">
+                <%= Calendar.strftime(event.date, "%d/%m/%Y") %> &bull; <%= event.location %>
+              </p>
+            </div>
+            <div style="color:var(--primary);">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </div>
+          </a>
+        <% end %>
+
+        <%= if Enum.empty?(@explore_events) do %>
+          <div style="padding:2rem; text-align:center; border-radius:12px; border:1px dashed var(--border-color);">
+            <p style="color:var(--text-muted); margin:0;">Nenhum evento novo disponível no momento.</p>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+  </div>
+</div>
