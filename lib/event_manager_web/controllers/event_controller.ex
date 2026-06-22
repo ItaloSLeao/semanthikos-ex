@@ -8,13 +8,23 @@ defmodule EventManagerWeb.EventController do
   alias EventManager.Schemas.Event
 
   # --- Public Event Viewing ---
-  def index(conn, _params) do
-    events = EventManager.Core.list_events(
-      status: :published,
-      upcoming_only: true,
-      order_by: {:date, :asc}
-    )
-    render(conn, :index, events: events)
+  def index(conn, params) do
+    search_query = params["q"] |> normalize_search_query()
+
+    events =
+      if search_query do
+        EventManager.Core.search_events(search_query)
+        |> Enum.filter(&(Event.upcoming?(&1) and &1.status == :published))
+        |> Enum.sort_by(&DateTime.to_unix(&1.date))
+      else
+        EventManager.Core.list_events(
+          status: :published,
+          upcoming_only: true,
+          order_by: {:date, :asc}
+        )
+      end
+
+    render(conn, :index, events: events, search_query: search_query)
   end
 
   def show(conn, %{"id" => id}) do
@@ -101,6 +111,17 @@ defmodule EventManagerWeb.EventController do
       |> redirect(to: ~p"/speaker/events/#{event_id}/attendees")
     else
       conn |> put_flash(:error, "Sem permissão.") |> redirect(to: ~p"/")
+    end
+  end
+
+  defp normalize_search_query(nil), do: nil
+
+  defp normalize_search_query(query) when is_binary(query) do
+    query
+    |> String.trim()
+    |> case do
+      "" -> nil
+      value -> value
     end
   end
 end

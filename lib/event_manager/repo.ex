@@ -49,8 +49,19 @@ defmodule EventManager.Repo do
   Searches across title and description fields.
   """
   def search_events(query_term) do
+    like_term = "%#{query_term}%"
+
     from e in EventManager.Schemas.Event,
-      where: fragment("to_tsvector('portuguese', title || ' ' || description) @@ plainto_tsquery('portuguese', ?)", ^query_term),
+      left_join: s in assoc(e, :speaker),
+      where:
+        fragment(
+          "to_tsvector('portuguese', ? || ' ' || ?) @@ plainto_tsquery('portuguese', ?)",
+          e.title,
+          e.description,
+          ^query_term
+        ) or
+          ilike(e.location, ^like_term) or
+          ilike(s.name, ^like_term),
       order_by: [desc: e.date],
       select: e
   end
