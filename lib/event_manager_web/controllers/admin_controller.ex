@@ -15,6 +15,8 @@ defmodule EventManagerWeb.AdminController do
   end
 
   def create_event(conn, %{"event" => event_params}) do
+    {event_params, upload} = pop_event_banner(conn, event_params)
+
     # Garante um usuário no banco para evitar erro de Foreign Key no protótipo
     speaker_id = case EventManager.Repo.all(EventManager.Schemas.User) do
       [user | _] -> user.id
@@ -27,7 +29,7 @@ defmodule EventManagerWeb.AdminController do
         new_user.id
     end
 
-    with {:ok, event_params} <- maybe_put_event_banner(conn, event_params) do
+    with {:ok, event_params} <- maybe_put_event_banner(upload, event_params) do
       # Sobrescreve o speaker_id vindo do form com o ID válido
       event_params = Map.put(event_params, "speaker_id", speaker_id)
 
@@ -54,8 +56,9 @@ defmodule EventManagerWeb.AdminController do
 
   def update_event(conn, %{"id" => id, "event" => event_params}) do
     event = EventManager.Core.get_event!(id)
+    {event_params, upload} = pop_event_banner(conn, event_params)
 
-    with {:ok, event_params} <- maybe_put_event_banner(conn, event_params) do
+    with {:ok, event_params} <- maybe_put_event_banner(upload, event_params) do
       case EventManager.Core.update_event(event, event_params) do
         {:ok, event} -> conn |> put_flash(:info, "Evento atualizado com sucesso.") |> redirect(to: ~p"/admin/events/#{event.id}/edit")
         {:error, changeset} -> render(conn, "event_edit.html", event: event, changeset: changeset, speakers: EventManager.Core.list_speakers())
@@ -150,7 +153,19 @@ defmodule EventManagerWeb.AdminController do
     conn |> put_flash(:info, "#{count} certificados gerados com sucesso.") |> redirect(to: ~p"/admin/events")
   end
 
-  defp maybe_put_event_banner(%{params: %{"event_banner" => %Plug.Upload{} = upload}}, event_params) do
+  defp pop_event_banner(%{params: %{"event_banner" => %Plug.Upload{} = upload}}, event_params) do
+    {Map.delete(event_params, "banner"), upload}
+  end
+
+  defp pop_event_banner(_conn, %{"banner" => %Plug.Upload{} = upload} = event_params) do
+    {Map.delete(event_params, "banner"), upload}
+  end
+
+  defp pop_event_banner(_conn, event_params), do: {Map.delete(event_params, "banner"), nil}
+
+  defp maybe_put_event_banner(nil, event_params), do: {:ok, event_params}
+
+  defp maybe_put_event_banner(%Plug.Upload{} = upload, event_params) do
     allowed_extensions = ~w(.jpg .jpeg .png .webp)
     max_size = 5 * 1024 * 1024
     extension = upload.filename |> Path.extname() |> String.downcase()
@@ -175,5 +190,4 @@ defmodule EventManagerWeb.AdminController do
     end
   end
 
-  defp maybe_put_event_banner(_conn, event_params), do: {:ok, event_params}
 end

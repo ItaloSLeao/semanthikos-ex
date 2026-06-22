@@ -5,29 +5,34 @@
   <h1 style="font-family:'DM Serif Display',serif; font-size:2.2rem; margin:0 0 2rem;">Editar Evento</h1>
 
   <div class="surface" style="border-radius:12px; padding:2rem;">
-    <.form :let={f} for={@changeset} action={~p"/admin/events/#{@event.id}"} method="put" multipart>
-      <input type="hidden" name="event[speaker_id]" value="1" />
+    <.form :let={f} for={@changeset} action={~p"/admin/events/#{@event.id}"} method="put" multipart={true}>
       <div style="display:flex; flex-direction:column; gap:1.5rem;">
-        <.input name={f[:title].name} id={f[:title].id} value={f[:title].value} type="text" label="Título do Evento" required />
-        <.input name={f[:description].name} id={f[:description].id} value={f[:description].value} type="text" label="Descrição" required />
+        <.input name={f[:title].name} id={f[:title].id} value={f[:title].value} errors={f[:title].errors} type="text" label="Título do Evento" required />
+        <.input name={f[:description].name} id={f[:description].id} value={f[:description].value} errors={f[:description].errors} type="text" label="Descrição" required />
 
         <div>
-          <label for="event_banner" style="display:block; font-size:0.85rem; font-weight:700; color:var(--text-primary); margin-bottom:0.5rem;">Banner do Evento</label>
-          <%= if @event.image_url do %>
+          <label style="display:block; font-size:0.85rem; font-weight:700; color:var(--text-primary); margin-bottom:0.5rem;">Banner do Evento</label>
+          <%= if assigns[:event] && @event.image_url do %>
             <img src={@event.image_url} alt="Banner atual do evento" style="width:100%; aspect-ratio:16/7; object-fit:cover; border-radius:8px; border:1px solid var(--border-color); margin-bottom:0.75rem;" />
           <% end %>
-          <input id="event_banner" name="event_banner" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" style="width:100%; padding:0.85rem; border:1px solid var(--border-color); border-radius:8px; background:transparent; color:var(--text-primary);" />
-          <p style="margin:0.4rem 0 0; font-size:0.78rem; color:var(--text-muted);">JPG, PNG ou WEBP até 5 MB. Envie um novo arquivo apenas se quiser trocar o banner.</p>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <label for="event_banner" style="cursor: pointer; padding: 0.6rem 1.2rem; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-surface-hover); color: var(--text-primary); font-size: 0.85rem; font-weight: 500; transition: background 0.2s;">
+              Escolher Arquivo
+            </label>
+            <span id="banner_filename" style="font-size: 0.85rem; color: var(--text-muted);">(Nenhum arquivo escolhido)</span>
+            <input id="event_banner" name="event[banner]" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" style="display: none;" onchange="document.getElementById('banner_filename').textContent = this.files.length > 0 ? this.files[0].name : '(Nenhum arquivo escolhido)'" />
+          </div>
+          <p style="margin:0.5rem 0 0; font-size:0.78rem; color:var(--text-muted);">JPG, PNG ou WEBP até 5 MB. Envie um novo arquivo apenas se quiser trocar o banner.</p>
         </div>
         
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem;">
-          <.input name={f[:date].name} id={f[:date].id} value={f[:date].value} type="datetime-local" label="Data e Hora" required />
-          <.input name={f[:duration_minutes].name} id={f[:duration_minutes].id} value={f[:duration_minutes].value} type="number" label="Duração (minutos)" required />
+          <.input name={f[:date].name} id={f[:date].id} value={Calendar.strftime(@event.date, "%Y-%m-%dT%H:%M")} errors={f[:date].errors} type="datetime-local" label="Data e Hora" required />
+          <.input name={f[:duration_minutes].name} id={f[:duration_minutes].id} value={f[:duration_minutes].value} errors={f[:duration_minutes].errors} type="number" label="Duração (minutos)" required />
         </div>
 
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem;">
-          <.input name={f[:location].name} id={f[:location].id} value={f[:location].value} type="text" label="Local" required />
-          <.input name={f[:max_seats].name} id={f[:max_seats].id} value={f[:max_seats].value} type="number" label="Máximo de Vagas" required />
+          <.input name={f[:location].name} id={f[:location].id} value={f[:location].value} errors={f[:location].errors} type="text" label="Local" required />
+          <.input name={f[:max_seats].name} id={f[:max_seats].id} value={f[:max_seats].value} errors={f[:max_seats].errors} type="number" label="Máximo de Vagas" required />
         </div>
 
         <div style="margin-top: 1rem; text-align: right;">

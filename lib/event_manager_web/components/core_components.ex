@@ -157,7 +157,13 @@ defmodule EventManagerWeb.CoreComponents do
       <%= if @errors != [] do %>
         <div style="font-size:0.8rem; color:var(--danger);">
           <%= for error <- @errors do %>
-            <p style="margin:0;"><%= error %></p>
+            <p style="margin:0;">
+              <%= if is_tuple(error) do %>
+                <%= elem(error, 0) %>
+              <% else %>
+                <%= error %>
+              <% end %>
+            </p>
           <% end %>
         </div>
       <% end %>
