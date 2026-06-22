@@ -1,13 +1,21 @@
 defmodule EventManagerWeb.EventChatLive do
   @moduledoc "LiveView for event chat with Q&A."
   use EventManagerWeb, :live_view
-  
+
+  alias EventManagerWeb.Presence
 
   @impl true
   def mount(%{"id" => event_id}, _session, socket) do
-    if connected?(socket), do: Phoenix.PubSub.subscribe(EventManager.PubSub, "event_chat:#{event_id}")
-
     current_user = socket.assigns.current_user
+    presence_topic = "event_chat:#{event_id}"
+
+    if connected?(socket) do
+      Phoenix.PubSub.subscribe(EventManager.PubSub, presence_topic)
+
+      Presence.track(self(), presence_topic, current_user.id, %{
+        online_at: DateTime.utc_now() |> DateTime.to_iso8601()
+      })
+    end
 
     messages_raw = EventManager.Services.list_event_chat_messages(event_id, limit: 100)
 
@@ -52,7 +60,9 @@ defmodule EventManagerWeb.EventChatLive do
         message_input: "",
         is_question: false,
         current_user: current_user,
-        last_message_date: last_date
+        last_message_date: last_date,
+        presence_topic: presence_topic,
+        online_users: list_online_users(presence_topic)
       )
       |> allow_upload(:chat_file, accept: ~w(.jpg .jpeg .png .pdf), max_entries: 1, max_file_size: 10_000_000)
       |> stream(:messages, messages)
@@ -164,4 +174,18 @@ defmodule EventManagerWeb.EventChatLive do
     end
   end
 
+  @impl true
+  def handle_info(%{event: "presence_diff"}, socket) do
+    {:noreply, assign(socket, online_users: list_online_users(socket.assigns.presence_topic))}
+  end
+
+  defp list_online_users(topic) do
+    topic
+    |> Presence.list()
+    |> Enum.map(fn {_id, %{user: user, metas: metas}} ->
+      %{user: user, metas: metas}
+    end)
+    |> Enum.reject(&is_nil(&1.user))
+    |> Enum.sort_by(&String.downcase(&1.user.name || ""))
+  end
 end

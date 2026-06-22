@@ -36,6 +36,45 @@
           </a>
         <% end %>
       </div>
+
+      <div style="border-top:1px solid var(--border-color); padding:1rem; background:var(--bg-surface-hover);">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:0.75rem; margin-bottom:0.75rem;">
+          <h3 style="font-size:0.85rem; font-weight:700; margin:0; color:var(--text-primary);">Online agora</h3>
+          <span style="font-size:0.72rem; color:var(--text-muted); font-weight:700; padding:3px 8px; border-radius:999px; border:1px solid var(--border-color); background:var(--bg-body);">
+            <%= length(@online_users) %>
+          </span>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:0.65rem; max-height:180px; overflow-y:auto;">
+          <%= for %{user: user} <- @online_users do %>
+            <% initial = String.at(user.name || "U", 0) |> String.upcase() %>
+            <div style="display:flex; align-items:center; gap:0.65rem; min-width:0;">
+              <div style="position:relative; flex-shrink:0;">
+                <div style="width:30px; height:30px; border-radius:50%; background:var(--primary); color:#000; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.8rem; overflow:hidden;">
+                  <%= if user.avatar_path do %>
+                    <img src={user.avatar_path} alt="Avatar" style="width:100%; height:100%; object-fit:cover;" />
+                  <% else %>
+                    <%= initial %>
+                  <% end %>
+                </div>
+                <span style="position:absolute; right:-1px; bottom:-1px; width:9px; height:9px; border-radius:50%; background:var(--success); border:2px solid var(--bg-surface-hover);"></span>
+              </div>
+              <div style="min-width:0;">
+                <div style="font-size:0.82rem; color:var(--text-primary); font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                  <%= if user.id == @current_user.id, do: "Você", else: user.name %>
+                </div>
+                <div style="font-size:0.72rem; color:var(--text-muted);">
+                  <%= case user.role do
+                    :admin -> "Administrador"
+                    :speaker -> "Palestrante"
+                    _ -> "Aluno"
+                  end %>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
     </div>
 
     <!-- Main Chat Area -->

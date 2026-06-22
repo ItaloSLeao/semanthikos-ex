@@ -227,7 +227,7 @@ Chat do Evento
 - [x] Sala de chat por evento
 - [x] Envio de mensagens
 - [x] Recebimento em tempo real
-- [ ] (Parcial) Exibicao de usuarios conectados
+- [x] Exibicao de usuarios conectados
 
 Notificacoes
 
@@ -236,7 +236,7 @@ Notificacoes
 - [ ] (Parcial) Lembrete de evento proximo via funcao de broadcast
 - [x] Atualizacoes em tempo real na ocupacao
 
-Notas: `Presence` esta configurado, mas a exibicao de conectados no chat ainda nao aparece como funcionalidade completa.
+Notas: `Presence` esta configurado e o chat exibe os participantes online por sala de evento.
 
 ### 6. Relatorios e Dashboards
 
@@ -396,4 +396,3 @@ Notas: `mix compile --warnings-as-errors` passa. `mix test` possui 1 teste e ele
 2. Remover atalhos de prototipo: admin criado no login e palestrante sobrescrito ao criar evento.
 3. Implementar PDF real para certificados.
 4. Adicionar upload validado de banner do evento.
-5. Completar Presence no chat com lista de usuarios conectados.
