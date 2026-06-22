@@ -53,8 +53,12 @@
                  onmouseover="this.style.transform='translateY(-6px)'; this.style.borderColor='var(--primary)'"
                  onmouseout="this.style.transform=''; this.style.borderColor='var(--border-color)'">
 
-          <%!-- Top status stripe --%>
-          <div style="height:6px; background:linear-gradient(90deg,var(--primary),var(--primary-hover));"></div>
+          <%= if event.image_url do %>
+            <img src={event.image_url} alt={"Banner de #{event.title}"} style="width:100%; aspect-ratio:16/7; object-fit:cover; display:block;" />
+          <% else %>
+            <%!-- Top status stripe --%>
+            <div style="height:6px; background:linear-gradient(90deg,var(--primary),var(--primary-hover));"></div>
+          <% end %>
 
           <div style="padding:2rem; flex:1;">
             <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:1rem; margin-bottom:1.5rem;">

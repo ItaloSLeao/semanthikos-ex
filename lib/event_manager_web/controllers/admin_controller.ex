@@ -27,16 +27,23 @@ defmodule EventManagerWeb.AdminController do
         new_user.id
     end
 
-    # Sobrescreve o speaker_id vindo do form com o ID válido
-    event_params = Map.put(event_params, "speaker_id", speaker_id)
+    with {:ok, event_params} <- maybe_put_event_banner(conn, event_params) do
+      # Sobrescreve o speaker_id vindo do form com o ID válido
+      event_params = Map.put(event_params, "speaker_id", speaker_id)
 
-    case EventManager.Core.create_event(event_params) do
-      {:ok, _event} ->
+      case EventManager.Core.create_event(event_params) do
+        {:ok, _event} ->
+          conn
+          |> put_flash(:info, "Evento criado com sucesso!")
+          |> redirect(to: ~p"/events") # Redireciona direto para o catálogo para ver o resultado
+        {:error, changeset} ->
+          render(conn, "event_new.html", changeset: changeset, speakers: EventManager.Core.list_speakers())
+      end
+    else
+      {:error, message} ->
         conn
-        |> put_flash(:info, "Evento criado com sucesso!")
-        |> redirect(to: ~p"/events") # Redireciona direto para o catálogo para ver o resultado
-      {:error, changeset} ->
-        render(conn, "event_new.html", changeset: changeset, speakers: EventManager.Core.list_speakers())
+        |> put_flash(:error, message)
+        |> render("event_new.html", changeset: Event.changeset(%Event{}, event_params), speakers: EventManager.Core.list_speakers())
     end
   end
 
@@ -47,9 +54,17 @@ defmodule EventManagerWeb.AdminController do
 
   def update_event(conn, %{"id" => id, "event" => event_params}) do
     event = EventManager.Core.get_event!(id)
-    case EventManager.Core.update_event(event, event_params) do
-      {:ok, event} -> conn |> put_flash(:info, "Evento atualizado com sucesso.") |> redirect(to: ~p"/admin/events/#{event.id}/edit")
-      {:error, changeset} -> render(conn, "event_edit.html", event: event, changeset: changeset, speakers: EventManager.Core.list_speakers())
+
+    with {:ok, event_params} <- maybe_put_event_banner(conn, event_params) do
+      case EventManager.Core.update_event(event, event_params) do
+        {:ok, event} -> conn |> put_flash(:info, "Evento atualizado com sucesso.") |> redirect(to: ~p"/admin/events/#{event.id}/edit")
+        {:error, changeset} -> render(conn, "event_edit.html", event: event, changeset: changeset, speakers: EventManager.Core.list_speakers())
+      end
+    else
+      {:error, message} ->
+        conn
+        |> put_flash(:error, message)
+        |> render("event_edit.html", event: event, changeset: Event.changeset(event, event_params), speakers: EventManager.Core.list_speakers())
     end
   end
 
@@ -134,4 +149,31 @@ defmodule EventManagerWeb.AdminController do
     count = EventManager.Services.generate_event_certificates(event_id)
     conn |> put_flash(:info, "#{count} certificados gerados com sucesso.") |> redirect(to: ~p"/admin/events")
   end
+
+  defp maybe_put_event_banner(%{params: %{"event_banner" => %Plug.Upload{} = upload}}, event_params) do
+    allowed_extensions = ~w(.jpg .jpeg .png .webp)
+    max_size = 5 * 1024 * 1024
+    extension = upload.filename |> Path.extname() |> String.downcase()
+    size = File.stat!(upload.path).size
+
+    cond do
+      extension not in allowed_extensions ->
+        {:error, "Banner inválido. Envie uma imagem JPG, PNG ou WEBP."}
+
+      size > max_size ->
+        {:error, "Banner muito grande. O limite é 5 MB."}
+
+      true ->
+        upload_path = Path.join(:code.priv_dir(:event_manager), "static/uploads/events")
+        File.mkdir_p!(upload_path)
+
+        filename = "#{System.unique_integer([:positive])}-event-banner#{extension}"
+        destination = Path.join(upload_path, filename)
+        File.cp!(upload.path, destination)
+
+        {:ok, Map.put(event_params, "image_url", "/uploads/events/#{filename}")}
+    end
+  end
+
+  defp maybe_put_event_banner(_conn, event_params), do: {:ok, event_params}
 end

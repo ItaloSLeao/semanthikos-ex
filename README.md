@@ -269,7 +269,7 @@ Exportacao
 
 Upload de Imagens
 
-- [ ] (Parcial) Upload de banner do evento
+- [x] Upload de banner do evento
 - [x] Validacao de formato no upload do chat
 - [x] Limite de tamanho no upload do chat
 - [ ] (Parcial) Armazenamento seguro
@@ -279,7 +279,7 @@ Servir Arquivos
 - [x] Configuracao para arquivos estaticos
 - [x] Exibicao de imagens dos eventos via `image_url`
 
-Notas: existe upload de avatar e anexos do chat. Banner de evento esta modelado como URL, mas ainda nao ha fluxo dedicado de upload validado para eventos.
+Notas: existe upload de avatar, anexos do chat e banner de evento. O banner e salvo em `/uploads/events` e gravado no campo `image_url`.
 
 ### 8. Busca e Consultas Avancadas
 
@@ -395,4 +395,3 @@ Notas: `mix compile --warnings-as-errors` passa. `mix test` possui 1 teste e ele
 1. Corrigir a suite de testes e adicionar helpers de login para LiveView.
 2. Remover atalhos de prototipo: admin criado no login e palestrante sobrescrito ao criar evento.
 3. Implementar PDF real para certificados.
-4. Adicionar upload validado de banner do evento.

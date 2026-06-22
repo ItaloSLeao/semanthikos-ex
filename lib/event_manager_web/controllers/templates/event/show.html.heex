@@ -10,6 +10,10 @@
     <%!-- Gold accent top bar --%>
     <div style="height:5px; background:linear-gradient(90deg, var(--gold), var(--gold-pale), var(--cyan));"></div>
 
+    <%= if @event.image_url do %>
+      <img src={@event.image_url} alt={"Banner de #{@event.title}"} style="width:100%; aspect-ratio:16/6; object-fit:cover; display:block;" />
+    <% end %>
+
     <div style="padding:2.5rem;">
       <%!-- Title row --%>
       <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:1.5rem; margin-bottom:1.75rem;">
