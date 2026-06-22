@@ -4,7 +4,7 @@
   </a>
   <h1 style="font-family:'DM Serif Display',serif; font-size:2.2rem; margin:0 0 2rem;">Criar Novo Evento</h1>
 
-  <div style="background:white; border:1px solid #eae9e4; border-radius:12px; padding:2rem;">
+  <div class="surface" style="border-radius:12px; padding:2rem;">
     <.form :let={f} for={@changeset} action={~p"/admin/events"} multipart>
       <input type="hidden" name="event[speaker_id]" value="1" />
       <div style="display:flex; flex-direction:column; gap:1.5rem;">
@@ -13,7 +13,7 @@
 
         <div>
           <label for="event_banner" style="display:block; font-size:0.85rem; font-weight:700; color:var(--text-primary); margin-bottom:0.5rem;">Banner do Evento</label>
-          <input id="event_banner" name="event_banner" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" style="width:100%; padding:0.85rem; border:1px solid var(--border-color); border-radius:8px; background:var(--bg-body); color:var(--text-primary);" />
+          <input id="event_banner" name="event_banner" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" style="width:100%; padding:0.85rem; border:1px solid var(--border-color); border-radius:8px; background:transparent; color:var(--text-primary);" />
           <p style="margin:0.4rem 0 0; font-size:0.78rem; color:var(--text-muted);">JPG, PNG ou WEBP até 5 MB.</p>
         </div>
         
