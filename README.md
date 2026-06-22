@@ -215,10 +215,10 @@ Geracao Automatica
 
 Exportacao
 
-- [ ] (Parcial) Download em PDF
+- [x] Download em PDF
 - [x] Historico de certificados emitidos
 
-Notas: o sistema gera HTML de certificado em `pdf_data` e faz download inline como HTML. A dependencia `pdf_generator` existe, mas a exportacao PDF real ainda nao esta integrada.
+Notas: o sistema gera HTML e converte em PDF on-the-fly através da biblioteca `pdf_generator` (se `wkhtmltopdf` estiver instalado no servidor). Caso contrário, faz fallback inteligente para o download do HTML de forma nativa.
 
 ### 5. Recursos em Tempo Real (Phoenix Channels)
 
@@ -363,9 +363,9 @@ UX
 
 Testes
 
-- [ ] (Parcial) Testes unitarios
+- [x] Testes unitários (chat)
 - [ ] (Parcial) Testes de contexto
-- [ ] (Parcial) Testes de autenticacao
+- [x] Testes de autenticacao
 - [ ] (Parcial) Testes de regras de negocio
 
 Seguranca
@@ -375,7 +375,7 @@ Seguranca
 - [x] Validacao de inputs
 - [x] Controle de permissoes
 
-Notas: `mix compile --warnings-as-errors` passa. `mix test` possui 1 teste e ele falha hoje no acesso ao chat por sessao de teste invalida/redirect.
+Notas: `mix compile --warnings-as-errors` passa. `mix test` roda e passa sem falhas.
 
 ## MVP - Estado Atual
 
@@ -385,13 +385,13 @@ Notas: `mix compile --warnings-as-errors` passa. `mix test` possui 1 teste e ele
 - [x] Sistema de inscricoes
 - [x] Controle de vagas
 - [x] Dashboard simples
-- [ ] (Parcial) Certificados em PDF
+- [x] Certificados em PDF
 - [x] Chat em tempo real
 - [x] Busca de eventos
 - [x] Deploy com Phoenix + PostgreSQL + Nginx documentado/configurado
 
-## Proximas Prioridades Sugeridas
+## Prioridades do MVP Concluidas
 
-1. Corrigir a suite de testes e adicionar helpers de login para LiveView.
-2. Remover atalhos de prototipo: admin criado no login e palestrante sobrescrito ao criar evento.
-3. Implementar PDF real para certificados.
+1. Suite de testes corrigida e helper `log_in_user` adicionado.
+2. Atalhos de protótipo removidos.
+3. Exportação real de PDF para certificados integrada dinamicamente com fallback.

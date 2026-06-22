@@ -63,197 +63,468 @@ defmodule EventManager.Services do
 
   def build_certificate_pdf(user, event, cert) do
     """
-    <!DOCTYPE html><html><head><meta charset="utf-8">
-    <style>
-      @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@400;500;600&display=swap');
-      @page { size: A4 landscape; margin: 0; }
-      body {
-        margin: 0; padding: 0;
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
-        background-color: #e2e8f0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-      }
-      .certificate-wrapper {
-        box-sizing: border-box;
-        background-color: #ffffff;
-        background-image: 
-          radial-gradient(circle at center, rgba(212, 175, 55, 0.08) 0%, transparent 60%),
-          repeating-linear-gradient(45deg, rgba(26, 54, 93, 0.03) 0px, rgba(26, 54, 93, 0.03) 1px, transparent 1px, transparent 10px),
-          repeating-linear-gradient(-45deg, rgba(212, 175, 55, 0.04) 0px, rgba(212, 175, 55, 0.04) 1px, transparent 1px, transparent 10px);
-        position: relative;
-        overflow: hidden;
-      }
-      @media screen {
-        .certificate-wrapper {
-          width: 297mm; height: 210mm;
-          padding: 12mm;
-          box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-          margin: 20px;
+    <!DOCTYPE html>
+    <html lang="pt-BR">
+    <head>
+      <meta charset="utf-8">
+      <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Cormorant+Garamond:ital,wght@1,500;1,600&family=Raleway:wght@300;400;500;600;700&display=swap');
+
+        @page { size: A4 landscape; margin: 0; }
+
+        *, *::before, *::after { box-sizing: border-box; }
+
+        body {
+          margin: 0; padding: 0;
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
+          background-color: #b8ae9e;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          min-height: 100vh;
         }
-      }
-      @media print {
-        body { background-color: #ffffff; display: block; }
+
+        /* ── Wrapper / Pergaminho ── */
         .certificate-wrapper {
-          width: 100vw; height: 100vh;
-          padding: 10mm;
-          margin: 0;
-          box-shadow: none;
+          position: relative;
+          overflow: hidden;
+          background-color: #F8F2E4;
+          background-image:
+            radial-gradient(ellipse 75% 55% at 50% 48%, rgba(184,149,42,0.10) 0%, transparent 68%),
+            repeating-linear-gradient(
+              0deg,
+              transparent 0px, transparent 29px,
+              rgba(12,31,60,0.018) 29px, rgba(12,31,60,0.018) 30px
+            ),
+            repeating-linear-gradient(
+              90deg,
+              transparent 0px, transparent 29px,
+              rgba(12,31,60,0.018) 29px, rgba(12,31,60,0.018) 30px
+            );
         }
-      }
 
-      .certificate-border {
-        position: relative;
-        width: 100%; height: 100%;
-        border: 12px solid #1a365d;
-        box-sizing: border-box;
-        padding: 10px;
-      }
-      .certificate-inner-border {
-        width: 100%; height: 100%;
-        border: 4px solid #d4af37;
-        box-sizing: border-box;
-        padding: 30px 50px;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        align-items: center;
-        background: rgba(255, 255, 255, 0.92);
-        box-shadow: inset 0 0 60px rgba(212, 175, 55, 0.15);
-        position: relative;
-      }
+        @media screen {
+          .certificate-wrapper {
+            width: 297mm; height: 210mm;
+            padding: 8mm;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.5), 0 6px 20px rgba(0,0,0,0.2);
+            margin: 20px;
+          }
+        }
 
-      .corner { position: absolute; width: 45px; height: 45px; border: 5px solid #d4af37; }
-      .corner-tl { top: -5px; left: -5px; border-right: none; border-bottom: none; }
-      .corner-tr { top: -5px; right: -5px; border-left: none; border-bottom: none; }
-      .corner-bl { bottom: -5px; left: -5px; border-right: none; border-top: none; }
-      .corner-br { bottom: -5px; right: -5px; border-left: none; border-top: none; }
+        @media print {
+          body { background-color: #F8F2E4; display: block; }
+          .certificate-wrapper {
+            width: 100vw; height: 100vh;
+            padding: 8mm;
+            margin: 0;
+            box-shadow: none;
+          }
+        }
 
-      .header {
-        font-family: 'Cinzel', serif;
-        font-size: 50px;
-        color: #1a365d;
-        letter-spacing: 14px;
-        margin-top: 10px;
-        margin-bottom: 0px;
-        text-transform: uppercase;
-        font-weight: 900;
-        text-shadow: 1px 1px 0 rgba(212, 175, 55, 0.5);
-      }
-      .subtitle {
-        font-family: 'Montserrat', sans-serif;
-        font-size: 16px;
-        color: #d4af37;
-        letter-spacing: 8px;
-        text-transform: uppercase;
-        margin-bottom: 25px;
-        font-weight: 700;
-      }
-      .content {
-        font-family: 'Playfair Display', serif;
-        font-size: 20px;
-        line-height: 1.6;
-        color: #2d3748;
-        text-align: center;
-        max-width: 85%;
-        z-index: 2;
-      }
-      .recipient {
-        font-family: 'Cinzel', serif;
-        font-size: 40px;
-        color: #1a365d;
-        font-weight: 700;
-        margin: 15px 0;
-        border-bottom: 2px solid #d4af37;
-        padding-bottom: 4px;
-        display: inline-block;
-      }
-      .event-title {
-        font-family: 'Montserrat', sans-serif;
-        font-size: 24px;
-        color: #1a365d;
-        font-weight: 700;
-        margin: 10px 0;
-        text-transform: uppercase;
-      }
-      .footer-grid {
-        width: 100%;
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-end;
-        margin-top: 20px;
-        font-family: 'Montserrat', sans-serif;
-        z-index: 2;
-      }
-      .signature-box { text-align: center; width: 280px; }
-      .signature-line { border-top: 1px solid #1a365d; margin-bottom: 8px; padding-top: 8px; }
-      .signature-box h4 { margin: 0; font-size: 16px; color: #1a365d; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
-      .signature-box p { margin: 4px 0 0; font-size: 11px; color: #718096; text-transform: uppercase; letter-spacing: 1px; }
-      
-      .cert-meta {
-        text-align: left; font-size: 10px; color: #718096; line-height: 1.6;
-        text-transform: uppercase; letter-spacing: 1px;
-      }
-      .badge-container {
-        width: 180px; height: 180px; position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); opacity: 0.15; z-index: 1;
-      }
-    </style>
+        /* ── Sistema de bordas triplas ── */
+        .b-outer {
+          width: 100%; height: 100%;
+          border: 9px solid #0C1F3C;
+          padding: 3px;
+        }
+
+        .b-gold {
+          width: 100%; height: 100%;
+          border: 2px solid #B8952A;
+          padding: 2px;
+        }
+
+        .b-inner {
+          width: 100%; height: 100%;
+          border: 1px solid rgba(12, 31, 60, 0.30);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: space-between;
+          padding: 14px 52px 11px;
+          position: relative;
+        }
+
+        /* ── Ornamentos de canto (CSS puro) ── */
+        .corner {
+          position: absolute;
+          width: 56px; height: 56px;
+          z-index: 6;
+        }
+
+        /* L externo em azul naval */
+        .corner-tl { top: -2px; left: -2px;
+          border-top: 6px solid #0C1F3C; border-left: 6px solid #0C1F3C; }
+        .corner-tr { top: -2px; right: -2px;
+          border-top: 6px solid #0C1F3C; border-right: 6px solid #0C1F3C; }
+        .corner-bl { bottom: -2px; left: -2px;
+          border-bottom: 6px solid #0C1F3C; border-left: 6px solid #0C1F3C; }
+        .corner-br { bottom: -2px; right: -2px;
+          border-bottom: 6px solid #0C1F3C; border-right: 6px solid #0C1F3C; }
+
+        /* L interno dourado (accent) */
+        .corner::before {
+          content: '';
+          position: absolute;
+          width: 38px; height: 38px;
+        }
+        .corner-tl::before { top: 10px; left: 10px;
+          border-top: 1.5px solid #B8952A; border-left: 1.5px solid #B8952A; }
+        .corner-tr::before { top: 10px; right: 10px;
+          border-top: 1.5px solid #B8952A; border-right: 1.5px solid #B8952A; }
+        .corner-bl::before { bottom: 10px; left: 10px;
+          border-bottom: 1.5px solid #B8952A; border-left: 1.5px solid #B8952A; }
+        .corner-br::before { bottom: 10px; right: 10px;
+          border-bottom: 1.5px solid #B8952A; border-right: 1.5px solid #B8952A; }
+
+        /* Losango dourado no vértice do L */
+        .corner::after {
+          content: '';
+          position: absolute;
+          width: 10px; height: 10px;
+          background: #B8952A;
+          transform: rotate(45deg);
+        }
+        .corner-tl::after { top: -2px;    left: -2px; }
+        .corner-tr::after { top: -2px;    right: -2px; }
+        .corner-bl::after { bottom: -2px; left: -2px; }
+        .corner-br::after { bottom: -2px; right: -2px; }
+
+        /* ── Cabeçalho ── */
+        .cert-header {
+          text-align: center;
+          z-index: 2;
+          line-height: 1;
+        }
+
+        .issuer-label {
+          font-family: 'Raleway', sans-serif;
+          font-size: 9px;
+          color: #B8952A;
+          letter-spacing: 5px;
+          text-transform: uppercase;
+          font-weight: 600;
+          display: block;
+          margin-bottom: 5px;
+        }
+
+        .cert-main-title {
+          font-family: 'Cinzel', serif;
+          font-size: 46px;
+          color: #0C1F3C;
+          letter-spacing: 16px;
+          text-transform: uppercase;
+          font-weight: 700;
+          line-height: 1;
+          display: block;
+          text-shadow: 0 1px 0 rgba(184,149,42,0.38);
+        }
+
+        .cert-type {
+          font-family: 'Raleway', sans-serif;
+          font-size: 10.5px;
+          color: #B8952A;
+          letter-spacing: 7px;
+          text-transform: uppercase;
+          font-weight: 600;
+          display: block;
+          margin-top: 5px;
+        }
+
+        /* ── Divisor ornamental ── */
+        .divider {
+          width: 94%;
+          display: flex;
+          align-items: center;
+          gap: 14px;
+          z-index: 2;
+          flex-shrink: 0;
+        }
+
+        .div-line {
+          flex: 1;
+          height: 1px;
+          background: linear-gradient(90deg, transparent 0%, #B8952A 35%, #B8952A 65%, transparent 100%);
+        }
+
+        .div-motif {
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          flex-shrink: 0;
+        }
+
+        .d-sm {
+          display: block;
+          width: 5px; height: 5px;
+          background: #B8952A;
+          transform: rotate(45deg);
+          flex-shrink: 0;
+        }
+
+        .d-md {
+          display: block;
+          width: 8px; height: 8px;
+          background: #B8952A;
+          transform: rotate(45deg);
+          flex-shrink: 0;
+        }
+
+        /* ── Corpo do certificado ── */
+        .cert-body {
+          font-family: 'EB Garamond', serif;
+          font-size: 17.5px;
+          line-height: 1.48;
+          color: #252530;
+          text-align: center;
+          z-index: 2;
+          max-width: 88%;
+        }
+
+        .certify-phrase {
+          font-style: italic;
+          font-size: 16px;
+          color: #6a6a7a;
+          display: block;
+          margin-bottom: 3px;
+        }
+
+        /* Elemento-assinatura: Cormorant Garamond itálico para o nome */
+        .recipient {
+          font-family: 'Cormorant Garamond', serif;
+          font-style: italic;
+          font-size: 37px;
+          color: #0C1F3C;
+          font-weight: 600;
+          display: inline-block;
+          margin: 4px 0;
+          padding-bottom: 5px;
+          border-bottom: 1px solid #B8952A;
+          letter-spacing: 0.5px;
+        }
+
+        .participation {
+          display: block;
+          margin: 3px 0;
+        }
+
+        .event-name {
+          font-family: 'Cinzel', serif;
+          font-size: 14.5px;
+          color: #0C1F3C;
+          font-weight: 600;
+          letter-spacing: 1.5px;
+          text-transform: uppercase;
+          display: block;
+          margin: 2px 0;
+        }
+
+        .event-details {
+          font-size: 16.5px;
+          display: block;
+          margin: 2px 0;
+          color: #38384a;
+        }
+
+        .speaker {
+          font-style: italic;
+          font-size: 15px;
+          color: #7a7a8a;
+          display: block;
+          margin-top: 3px;
+        }
+
+        /* ── Rodapé ── */
+        .cert-footer {
+          width: 100%;
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-end;
+          z-index: 2;
+          position: relative;
+        }
+
+        .cert-meta {
+          font-family: 'Raleway', sans-serif;
+          font-size: 8px;
+          color: #9a9aaa;
+          line-height: 2;
+          text-transform: uppercase;
+          letter-spacing: 1.3px;
+          border-left: 2px solid #B8952A;
+          padding-left: 9px;
+        }
+
+        .cert-meta strong {
+          display: block;
+          color: #606072;
+          font-size: 8.5px;
+          font-weight: 600;
+          margin-bottom: 1px;
+        }
+
+        .sig-box {
+          text-align: center;
+          width: 200px;
+        }
+
+        .sig-line {
+          border-top: 1px solid #0C1F3C;
+          padding-top: 6px;
+        }
+
+        .sig-name {
+          font-family: 'Cinzel', serif;
+          font-size: 12.5px;
+          color: #0C1F3C;
+          font-weight: 600;
+          letter-spacing: 2px;
+          text-transform: uppercase;
+          display: block;
+        }
+
+        .sig-role {
+          font-family: 'Raleway', sans-serif;
+          font-size: 8px;
+          color: #9a9aaa;
+          text-transform: uppercase;
+          letter-spacing: 2px;
+          display: block;
+          margin-top: 2px;
+        }
+
+        /* ── Selo marca d'água ── */
+        .seal-watermark {
+          position: absolute;
+          bottom: 6px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 155px; height: 155px;
+          opacity: 0.11;
+          z-index: 1;
+          pointer-events: none;
+        }
+      </style>
     </head>
     <body>
       <div class="certificate-wrapper">
-        <div class="certificate-border">
-          <div class="certificate-inner-border">
-            <div class="corner corner-tl"></div>
-            <div class="corner corner-tr"></div>
-            <div class="corner corner-bl"></div>
-            <div class="corner corner-br"></div>
-            
-            <div style="text-align: center; z-index: 2;">
-              <h1 class="header">Certificado</h1>
-              <div class="subtitle">de #{cert_type(cert.certificate_type)}</div>
-            </div>
-            
-            <div class="content">
-              <p style="margin:0; font-style: italic;">Certificamos orgulhosamente que</p>
-              <div class="recipient">#{user.name}</div>
-              <p style="margin:0;">participou com êxito do evento acadêmico</p>
-              <div class="event-title">#{event.title}</div>
-              <p style="margin:10px 0 0;">
-                realizado em <strong>#{fmt_date(event.date)}</strong>, 
-                com carga horária oficial de <strong>#{div(event.duration_minutes, 60)} hora(s)</strong>,<br/>
-                na modalidade #{if event.is_online, do: "online", else: "presencial"} #{if !event.is_online, do: "em " <> event.location, else: ""}.
-              </p>
-              <p style="margin:10px 0 0; font-size:16px; font-style:italic;">#{if event.speaker, do: "Ministrado por #{event.speaker.name}", else: ""}</p>
-            </div>
+        <div class="b-outer">
+          <div class="b-gold">
+            <div class="b-inner">
 
-            <div class="footer-grid">
-              <div class="cert-meta">
-                <strong>Autenticidade e Verificação:</strong><br/>
-                Documento Nº: #{cert.certificate_number}<br/>
-                Data de Emissão: #{fmt_date(cert.generated_at)}
-              </div>
-              
-              <div class="signature-box">
-                <div class="signature-line"></div>
-                <h4>Semanthikos</h4>
-                <p>Coordenação Acadêmica</p>
-              </div>
-            </div>
+              <!-- Ornamentos de canto -->
+              <div class="corner corner-tl"></div>
+              <div class="corner corner-tr"></div>
+              <div class="corner corner-bl"></div>
+              <div class="corner corner-br"></div>
 
-            <div class="badge-container">
-              <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="50" cy="50" r="45" fill="#d4af37" fill-opacity="0.3" stroke="#d4af37" stroke-width="2" stroke-dasharray="4 4"/>
-                <circle cx="50" cy="50" r="35" fill="none" stroke="#1a365d" stroke-width="2"/>
-                <path d="M50 20 L55 35 L70 40 L55 45 L50 60 L45 45 L30 40 L45 35 Z" fill="#1a365d"/>
+              <!-- Cabeçalho -->
+              <div class="cert-header">
+                <!-- Brasão institucional minimalista -->
+                <svg width="38" height="38" viewBox="0 0 38 38" fill="none"
+                     xmlns="http://www.w3.org/2000/svg"
+                     style="display:block; margin:0 auto 5px; opacity:0.92;">
+                  <path d="M4 4 H34 V24 Q19 36 4 24 Z"
+                        fill="none" stroke="#B8952A" stroke-width="1.6"/>
+                  <path d="M7.5 7.5 H30.5 V23 Q19 32 7.5 23 Z"
+                        fill="none" stroke="#0C1F3C" stroke-width="0.7"/>
+                  <!-- Detalhe de lauréis esquemáticos -->
+                  <path d="M8.5 20 Q10 16 13 14.5 Q11.5 17.5 9.5 20 Z" fill="#0C1F3C"/>
+                  <path d="M29.5 20 Q28 16 25 14.5 Q26.5 17.5 28.5 20 Z" fill="#0C1F3C"/>
+                  <!-- Monograma S -->
+                  <text x="19" y="24" text-anchor="middle"
+                        font-family="Cinzel, serif" font-size="13"
+                        fill="#0C1F3C" font-weight="700">S</text>
+                </svg>
+
+                <span class="issuer-label">Semanthikos · Plataforma Acadêmica</span>
+                <span class="cert-main-title">Certificado</span>
+                <!-- cert_type retorna: "Participação", "Apresentação" ou "Organização" -->
+                <span class="cert-type">de #{cert_type(cert.certificate_type)}</span>
+              </div>
+
+              <!-- Divisor superior -->
+              <div class="divider">
+                <div class="div-line"></div>
+                <div class="div-motif">
+                  <span class="d-sm"></span>
+                  <span class="d-md"></span>
+                  <span class="d-sm"></span>
+                </div>
+                <div class="div-line"></div>
+              </div>
+
+              <!-- Corpo -->
+              <div class="cert-body">
+                <span class="certify-phrase">Certificamos que</span>
+                <span class="recipient">#{user.name}</span>
+                <span class="participation">participou com êxito do evento acadêmico</span>
+                <span class="event-name">#{event.title}</span>
+                <span class="event-details">
+                  realizado em <strong>#{fmt_date(event.date)}</strong>,
+                  com carga horária oficial de <strong>#{div(event.duration_minutes, 60)} hora(s)</strong>,<br/>
+                  na modalidade #{if event.is_online, do: "online", else: "presencial"} #{if !event.is_online, do: "em " <> event.location, else: ""}.
+                </span>
+                <span class="speaker">#{if event.speaker, do: "Ministrado por #{event.speaker.name}", else: ""}</span>
+              </div>
+
+              <!-- Divisor inferior -->
+              <div class="divider">
+                <div class="div-line"></div>
+                <div class="div-motif">
+                  <span class="d-sm"></span>
+                  <span class="d-md"></span>
+                  <span class="d-sm"></span>
+                </div>
+                <div class="div-line"></div>
+              </div>
+
+              <!-- Rodapé -->
+              <div class="cert-footer">
+                <div class="cert-meta">
+                  <strong>Autenticidade e Verificação</strong>
+                  Documento Nº: #{cert.certificate_number}<br/>
+                  Data de Emissão: #{fmt_date(cert.generated_at)}
+                </div>
+
+                <div class="sig-box">
+                  <div class="sig-line"></div>
+                  <span class="sig-name">Semanthikos</span>
+                  <span class="sig-role">Coordenação Acadêmica</span>
+                </div>
+              </div>
+
+              <!-- Selo marca d'água com texto circular -->
+              <svg class="seal-watermark" viewBox="0 0 200 200"
+                   fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <path id="cert-ring-path"
+                    d="M100,100 m-72,0 a72,72 0 1,1 144,0 a72,72 0 1,1 -144,0"/>
+                </defs>
+                <!-- Anéis concêntricos -->
+                <circle cx="100" cy="100" r="94" stroke="#B8952A" stroke-width="2.5" fill="none"/>
+                <circle cx="100" cy="100" r="88" stroke="#0C1F3C" stroke-width="0.6" fill="none"/>
+                <circle cx="100" cy="100" r="79" stroke="#B8952A" stroke-width="1"
+                        stroke-dasharray="4 3" fill="none"/>
+                <circle cx="100" cy="100" r="55" stroke="#0C1F3C" stroke-width="1.5" fill="none"/>
+                <circle cx="100" cy="100" r="49" stroke="#B8952A" stroke-width="0.7" fill="none"/>
+                <!-- Estrela central -->
+                <path d="M100 63 L107 84 L129 84 L113 97 L119 118 L100 105 L81 118 L87 97 L71 84 L93 84 Z"
+                      fill="#0C1F3C"/>
+                <!-- Texto no anel -->
+                <text font-family="Cinzel, serif" font-size="9" fill="#0C1F3C" letter-spacing="2">
+                  <textPath href="#cert-ring-path" startOffset="4%">
+                    · SEMANTHIKOS · COORDENAÇÃO ACADÊMICA · CERTIFICADO OFICIAL ·
+                  </textPath>
+                </text>
               </svg>
+
             </div>
           </div>
         </div>
       </div>
-      <script>window.onload = function() { setTimeout(function() { window.print(); }, 500); }</script>
     </body>
     </html>
     """
