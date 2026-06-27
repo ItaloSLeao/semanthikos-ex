@@ -77,8 +77,8 @@ priv/
 
 ```bash
 # Clone o repositório
-git clone https://github.com/ItaloSLeao/semanthykos-ex.git
-cd event_manager
+git clone https://github.com/ItaloSLeao/semanthikos-ex.git
+cd semanthikos.ex
 
 # Instale as dependências
 mix local.hex --force
